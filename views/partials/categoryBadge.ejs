@@ -1,0 +1,16 @@
+<%
+// Map category names to CSS classes defined in style.css
+const badgeMap = {
+  'Food':          'badge-food',
+  'Travel':        'badge-travel',
+  'Shopping':      'badge-shopping',
+  'Bills':         'badge-bills',
+  'Health':        'badge-health',
+  'Entertainment': 'badge-entertainment',
+  'Other':         'badge-other'
+};
+const badgeClass = badgeMap[categoryName] || 'badge-other';
+%>
+<span class="badge <%= badgeClass %>">
+  <%= categoryName || 'Other' %>
+</span>

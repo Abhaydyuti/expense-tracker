@@ -1,0 +1,11 @@
+services:
+  - type: web
+    name: expense-tracker
+    env: node
+    buildCommand: npm install
+    startCommand: npm start
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: SESSION_SECRET
+        generateValue: true  # Render auto-generates a secure value

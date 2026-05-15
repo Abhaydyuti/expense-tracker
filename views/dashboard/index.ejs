@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<%- include('../partials/head', { pageTitle: 'Dashboard' }) %>
+</head>
+<body class="bg-light">
+
+  <%- include('../partials/navbar') %>
+
+  <div class="container mt-4">
+
+    <!-- Page Header -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+      <div>
+        <h3 class="mb-0">Dashboard</h3>
+        <small class="text-muted">
+          Welcome back, <strong><%= currentUser.name %></strong>!
+        </small>
+      </div>
+      <div class="d-flex gap-2">
+        <a href="/dashboard/reports" class="btn btn-outline-primary btn-sm">
+          📊 Reports
+        </a>
+        <a href="/expenses/add" class="btn btn-primary btn-sm">
+          + Add Expense
+        </a>
+      </div>
+    </div>
+
+    <%- include('../partials/flash') %>
+
+    <!-- ── Summary Cards ─────────────────────────────────── -->
+    <div class="row g-3 mb-4">
+
+      <div class="col-md-3 col-sm-6">
+        <div class="card shadow-sm h-100 border-start border-primary border-4">
+          <div class="card-body">
+            <p class="text-muted small mb-1">This Month</p>
+            <!-- data-counter triggers the JS animated counter -->
+            <h4 class="fw-bold text-primary mb-0"
+                data-counter="<%= currentMonthTotal %>">
+              ₹<%= currentMonthTotal.toFixed(2) %>
+            </h4>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-md-3 col-sm-6">
+        <div class="card shadow-sm h-100 border-start border-success border-4">
+          <div class="card-body">
+            <p class="text-muted small mb-1">All Time Total</p>
+            <h4 class="fw-bold text-success mb-0"
+                data-counter="<%= allTimeTotal %>">
+              ₹<%= allTimeTotal.toFixed(2) %>
+            </h4>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-md-3 col-sm-6">
+        <div class="card shadow-sm h-100 border-start border-warning border-4">
+          <div class="card-body">
+            <p class="text-muted small mb-1">Top Category (This Month)</p>
+            <h5 class="fw-bold text-warning mb-0">
+              <% if (topCategory) { %>
+                <%= topCategory.category_name %>
+                <br>
+                <small class="fs-6 fw-normal">
+                  ₹<%= parseFloat(topCategory.total).toFixed(2) %>
+                </small>
+              <% } else { %>
+                <span class="text-muted fs-6 fw-normal">No data yet</span>
+              <% } %>
+            </h5>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-md-3 col-sm-6">
+        <div class="card shadow-sm h-100 border-start border-info border-4">
+          <div class="card-body">
+            <p class="text-muted small mb-1">Total Entries</p>
+            <h4 class="fw-bold text-info mb-0">
+              <%= expenseCount %>
+              <small class="fs-6 fw-normal text-muted">expenses</small>
+            </h4>
+          </div>
+        </div>
+      </div>
+
+    </div>
+    <!-- ── End Summary Cards ──────────────────────────────── -->
+
+
+    <!-- ── Charts Row 1: Bar + Doughnut ─────────────────── -->
+    <div class="row g-3 mb-4">
+
+      <div class="col-md-7">
+        <div class="card shadow-sm h-100">
+          <div class="card-body">
+            <div class="d-flex justify-content-between align-items-center mb-3">
+              <h6 class="text-muted mb-0">Monthly Spending</h6>
+              <span class="badge bg-light text-muted">Last 6 months</span>
+            </div>
+            <% if (monthlyTotals.length === 0) { %>
+              <div class="empty-state py-4">
+                <p class="text-muted">Add expenses to see your monthly chart</p>
+              </div>
+            <% } else { %>
+              <canvas id="barChart" height="130"></canvas>
+            <% } %>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-md-5">
+        <div class="card shadow-sm h-100">
+          <div class="card-body">
+            <div class="d-flex justify-content-between align-items-center mb-3">
+              <h6 class="text-muted mb-0">By Category</h6>
+              <span class="badge bg-light text-muted">All time</span>
+            </div>
+            <% const activeCats = categoryTotals.filter(c => parseFloat(c.total) > 0); %>
+            <% if (activeCats.length === 0) { %>
+              <div class="empty-state py-4">
+                <p class="text-muted">No category data yet</p>
+              </div>
+            <% } else { %>
+              <canvas id="doughnutChart" height="170"></canvas>
+            <% } %>
+          </div>
+        </div>
+      </div>
+
+    </div>
+    <!-- ── End Charts Row 1 ───────────────────────────────── -->
+
+
+    <!-- ── Line Chart — Daily Spending This Month ────────── -->
+    <div class="row g-3 mb-4">
+      <div class="col-12">
+        <div class="card shadow-sm">
+          <div class="card-body">
+            <div class="d-flex justify-content-between align-items-center mb-3">
+              <h6 class="text-muted mb-0">Daily Spending This Month</h6>
+              <span class="badge bg-light text-muted">Current month</span>
+            </div>
+            <% const parsedChart = JSON.parse(chartData); %>
+            <% if (!parsedChart.daily || parsedChart.daily.labels.length === 0) { %>
+              <div class="empty-state py-4">
+                <p class="text-muted">No spending recorded this month yet</p>
+              </div>
+            <% } else { %>
+              <canvas id="lineChart" height="80"></canvas>
+            <% } %>
+          </div>
+        </div>
+      </div>
+    </div>
+    <!-- ── End Line Chart ─────────────────────────────────── -->
+
+
+    <!-- ── Bottom Row: Recent + Monthly Summary ──────────── -->
+    <div class="row g-3">
+
+      <!-- Recent Expenses -->
+      <div class="col-md-7">
+        <div class="card shadow-sm">
+          <div class="card-body">
+            <div class="d-flex justify-content-between align-items-center mb-3">
+              <h6 class="text-muted mb-0">Recent Expenses</h6>
+              <a href="/expenses" class="small text-decoration-none">View all →</a>
+            </div>
+            <% if (recentExpenses.length === 0) { %>
+              <p class="text-muted text-center py-3">No expenses yet.</p>
+            <% } else { %>
+              <div class="table-responsive">
+                <table class="table table-sm align-middle mb-0">
+                  <thead class="table-light">
+                    <tr>
+                      <th>Date</th>
+                      <th>Title</th>
+                      <th>Category</th>
+                      <th class="text-end">Amount</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <% recentExpenses.forEach(e => { %>
+                      <tr>
+                        <td class="text-muted small" style="white-space:nowrap;">
+                          <%= new Date(e.expense_date).toLocaleDateString('en-IN', {
+                            day: '2-digit', month: 'short'
+                          }) %>
+                        </td>
+                        <td class="fw-semibold"><%= e.title %></td>
+                        <td>
+                          <%- include('../partials/categoryBadge', {
+      categoryName: e.category_name
+    }) %>
+                        </td>
+                        <td class="text-end text-success fw-semibold">
+                          ₹<%= parseFloat(e.amount).toFixed(2) %>
+                        </td>
+                      </tr>
+                    <% }) %>
+                  </tbody>
+                </table>
+              </div>
+            <% } %>
+          </div>
+        </div>
+      </div>
+
+      <!-- Monthly Summary Table -->
+      <div class="col-md-5">
+        <div class="card shadow-sm">
+          <div class="card-body">
+            <h6 class="text-muted mb-3">Monthly Summary</h6>
+            <% if (monthlyTotals.length === 0) { %>
+              <p class="text-muted text-center py-3">No data yet.</p>
+            <% } else { %>
+              <table class="table table-sm mb-0">
+                <thead class="table-light">
+                  <tr>
+                    <th>Month</th>
+                    <th class="text-end">Total Spent</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <% monthlyTotals.slice().reverse().forEach((m, i) => { %>
+                    <tr class="<%= i === 0 ? 'table-primary' : '' %>">
+                      <td>
+                        <%= m.month_label %>
+                        <% if (i === 0) { %>
+                          <span class="badge bg-primary ms-1" style="font-size:0.65rem;">
+                            current
+                          </span>
+                        <% } %>
+                      </td>
+                      <td class="text-end fw-semibold text-success">
+                        ₹<%= parseFloat(m.total).toFixed(2) %>
+                      </td>
+                    </tr>
+                  <% }) %>
+                </tbody>
+              </table>
+            <% } %>
+          </div>
+        </div>
+      </div>
+
+    </div>
+    <!-- ── End Bottom Row ─────────────────────────────────── -->
+
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script>
+    const chartData = <%- chartData %>;
+  </script>
+  <script src="/js/charts.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+  <%- include('../partials/footer') %>
+</body>
+</html>
