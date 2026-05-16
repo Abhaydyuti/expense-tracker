@@ -3,7 +3,7 @@
 A full-stack web application to track personal expenses with
 authentication, data visualisation, and monthly summaries.
 
-🔗 **Live Demo:** [expense-tracker-xxxx.onrender.com](https://expense-tracker-xxxx.onrender.com)
+🔗 **Live Demo:** [https://expense-tracker-bcoe.onrender.com](https://expense-tracker-bcoe.onrender.com)
 
 ---
 
@@ -66,7 +66,7 @@ expense-tracker/
 
 ```bash
 # 1. Clone the repo
-git clone https://github.com/YOUR_USERNAME/expense-tracker.git
+git clone https://github.com/Abhaydyuti/expense-tracker.git
 cd expense-tracker
 
 # 2. Install dependencies
@@ -114,4 +114,4 @@ expenses    — id, user_id, category_id, title,
 
 ## Author
 
-**Your Name** — [github.com/YOUR_USERNAME](https://github.com/YOUR_USERNAME)
+**Abhaydyuti** — [github.com/Abhaydyuti](https://github.com/Abhaydyuti)

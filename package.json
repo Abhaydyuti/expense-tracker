@@ -11,7 +11,7 @@
     "node": ">=18.0.0"
   },
   "keywords": [],
-  "author": "",
+  "author": "Abhaydyutis",
   "license": "ISC",
   "type": "commonjs",
   "dependencies": {
