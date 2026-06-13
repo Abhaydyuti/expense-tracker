@@ -13,6 +13,13 @@ const { notFoundHandler, errorHandler } = require('./middlewares/errorMiddleware
 
 const app = express();
 
+// ─── Trust Proxy ──────────────────────────────────────────────
+// Required when deployed on Render, Heroku, Railway, or any
+// platform that sits behind a reverse proxy.
+// Without this, express-rate-limit can't correctly identify
+// client IPs from the X-Forwarded-For header.
+app.set('trust proxy', 1);
+
 // ─── Security Headers (helmet) ───────────────────────────────
 // Sets a bunch of HTTP headers to protect against common attacks:
 // XSS, clickjacking, MIME sniffing, etc.
@@ -86,6 +93,11 @@ app.use((req, res, next) => {
     : null;
   next();
 });
+
+// ─── Silence favicon 404 ──────────────────────────────────────
+// Browsers automatically request /favicon.ico
+// Return an empty 204 (No Content) so it doesn't hit the 404 handler
+app.get('/favicon.ico', (req, res) => res.status(204).end());
 
 // ─── Routes ───────────────────────────────────────────────────
 const authRoutes      = require('./routes/authRoutes');
