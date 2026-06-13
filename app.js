@@ -104,10 +104,15 @@ const authRoutes      = require('./routes/authRoutes');
 const expenseRoutes   = require('./routes/expenseRoutes');
 const dashboardRoutes = require('./routes/dashboardRoutes');
 
-// Apply rate limiter to auth routes only
-app.use('/', authLimiter, authRoutes);
+
+// Rate limiter only on login and signup — not on normal app usage
+app.use('/login',   authLimiter);
+app.use('/signup',  authLimiter);
+
+app.use('/', authRoutes);
 app.use('/expenses',  expenseRoutes);
 app.use('/dashboard', dashboardRoutes);
+
 
 // ─── Home Route ───────────────────────────────────────────────
 app.get('/', (req, res) => {
