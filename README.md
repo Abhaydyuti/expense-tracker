@@ -3,8 +3,9 @@
 A full-stack web application to track personal expenses with
 authentication, data visualisation, and monthly summaries.
 
-🔗 **Live Demo:** [https://expense-tracker-bcoe.onrender.com](https://expense-tracker-bcoe.onrender.com)
+🔗 **Live Demo:** [https://expense-tracker-p6uj.onrender.com](https://expense-tracker-p6uj.onrender.com)
 
+![Dashboard Screenshot](./screenshots/dashboard.png)
 ---
 
 ## Features

@@ -52,7 +52,8 @@ app.use(helmet({
 // Prevents brute-force password attacks
 const authLimiter = rateLimit({
   windowMs:         15 * 60 * 1000, // 15 minutes
-  max:              10,              // max requests per window
+  max:              20,              // max requests per window
+  skipSuccessfulRequests: true, 
   message:          'Too many attempts. Please try again in 15 minutes.',
   standardHeaders:  true,
   legacyHeaders:    false,
